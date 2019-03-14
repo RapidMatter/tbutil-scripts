@@ -1,0 +1,3 @@
+[submodule "turboclouddash_export/libs"]
+	path = turboclouddash_export/libs
+	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
