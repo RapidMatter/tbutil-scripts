@@ -1,3 +1,6 @@
 [submodule "turboclouddash_export/lib"]
 	path = turboclouddash_export/lib
 	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
+[submodule "cloud_migration_plans/lib"]
+	path = cloud_migration_plans/lib
+	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
