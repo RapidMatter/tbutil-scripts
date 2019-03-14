@@ -11,7 +11,7 @@ See https://greencircle.vmturbo.com/docs/DOC-5897 for more information on tbutil
 But here are the installation steps in a nutshell:
 <br>
 (NOTE: Although there is a windows-compatible version of tbutil, the javascript capability being used here is only supported on Linux/Mac.)
- * Go here: https://s3.eu-west-2.amazonaws.com/turbonomic-emea-cs-bucket/tbutil/1.1g/1bb01170f03897422c44a74ff9878d80
+ * Ask your friendly Turbonomic SE for a download link of the latest tbutil version.
  * Download the Linux or Mac zip file
  * Unzip the file
  * cd tbutil-1_1g
