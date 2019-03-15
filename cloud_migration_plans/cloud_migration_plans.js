@@ -1,7 +1,15 @@
-/*global args,client,exit,eprintln,interpolate,printJson,println,require*/
+/*global args,client,exit,eprintln,getenv,interpolate,printJson,println,require*/
 /*jslint plusplus: true*/
 var plan = require("./lib/plans.js");
 var utilities = require("./lib/utilities.js");
+
+var desired_tbuilt_commit_date = utilities.tbutil_date_string_to_date_obj("2019-03-06 16:15:45 +0000");
+var tbutil_commit_date = utilities.tbutil_date_string_to_date_obj(getenv("TURBO_COMMIT_DATE"));
+
+if (tbutil_commit_date < desired_tbuilt_commit_date) {
+    eprintln("Expected tbutil 1.1i or newer. Currently installed " + getenv("TURBO_BRANCH") + ". Please upgrade to use this script");
+    exit(1);
+}
 
 function print_usage() {
     "use strict";
