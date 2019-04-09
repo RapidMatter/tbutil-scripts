@@ -39,7 +39,7 @@ This example is equivalent to the default (not providing either the `-p` or `a` 
 $ tbutil -s generate_baremetal_file.js -p
 ```
 
-This example will populate the utilization values with the average of that value, over the [Number of days](#number_of_days).
+This example will populate the utilization values with the average of that value, over the [Number of days](#number-of-days).
 ```
 $ tbutil -s generate_baremetal_file.js -a
 ```
