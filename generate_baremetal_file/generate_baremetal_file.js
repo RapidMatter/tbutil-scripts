@@ -18,7 +18,7 @@ var Stat = (function () {
             var peakval = 0,
                 i = 0;
 
-            if (this.hasOwnProperty("days")) {
+            if (this.hasOwnProperty("days") && this.days != null) {
                 for (i = 0; i < this.days.length; i++) {
                     if (this.days[i].hasOwnProperty("capacity")) {
                         if (this.days[i].capacity.total > peakval) {
@@ -34,7 +34,7 @@ var Stat = (function () {
             var peakval = 0,
                 i = 0;
 
-            if (this.hasOwnProperty("days")) {
+            if (this.hasOwnProperty("days") && this.days != null) {
                 for (i = 0; i < this.days.length; i++) {
                     if (this.days[i].hasOwnProperty("values")) {
                         if (this.days[i].values.max > peakval) {
@@ -50,7 +50,7 @@ var Stat = (function () {
             var totalval = 0,
                 i = 0;
 
-            if (this.hasOwnProperty("days")) {
+            if (this.hasOwnProperty("days") && this.days != null) {
                 for (i = 0; i < this.days.length; i++) {
                     totalval = totalval + this.days[i].values.total;
                 }
