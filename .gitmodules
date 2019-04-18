@@ -4,6 +4,6 @@
 [submodule "cloud_migration_plans/lib"]
 	path = cloud_migration_plans/lib
 	url = git@github.com:turbonomiclabs/tbutil-script-libs.git
-[submodule "aws_msp_markup/lib"]
-	path = aws_msp_markup/lib
-	url = git@github.com:turbonomiclabs/tbutil-script-libs.git
+[submodule "aws_account_summary/lib"]
+	path = aws_account_summary/lib
+	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
