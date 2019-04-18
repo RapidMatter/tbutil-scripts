@@ -8,10 +8,6 @@ function roundToHundrethsDecimal(number) {
 
 // https://se2.demo.turbonomic.com/vmturbo/rest/stats/Market?disable_hateoas=true
 var stat_payload_0 = {"statistics":[{"name":"costPrice","groupBy":["cloudService"],"relatedEntityType":"CloudService"}]} // Cost Breakdown by Cloud Service request 1
-var stat_payload_1 = {"statistics":[{"name":"costPrice","groupBy":["cloudService"],"relatedEntityType":"CloudService"}],"startDate":1552860000000,"endDate":1552953511522} // Cost Breakdown by Cloud Service request 2 (beginning of yesterday until now0)
-var stat_payload_2 = {"statistics":[{"name":"costPrice","groupBy":["cloudService", "CSP"]}]}
-var stat_payload_3 = {"statistics":[{"filters":[{"type":"CSP","value":"AWS"}],"groupBy":["cloudService"],"name":"costPrice","relatedEntityType":"CloudService"}]}
-
 
 var est_stat_payload_0 = {
   "statistics": [
