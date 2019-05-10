@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+- '7'
+before_script:
+- npm install -g gulp-cli gulp-concat
+env:
+- DEPLOY_DIR=assessment
+script: cd $DEPLOY_DIR && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
+  cp $DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
+after_script:
+- cd $TRAVIS_BUILD_DIR/release
+- zip Release.zip
+deploy:
+  provider: releases
+  api_key:
+    secure: gclv9yPAvbKOLBYP22CDdSwZpoctL2Jsjl0MsG4w9EGlqUgtInYsXHjsTYhPqgWAkhf2AaFqC4IEPR1LmHcP0L09bgLT/DrbrpWlx0LmKY8VAKGH4dldDv15UwBBMqm5S/8yoGlfbvtn8cmkNMA0SfXiQmrcfcs2+nD5v02ta0xC5MrlPDZ6Sz+HRccLciz8FVNPPehNiUTwluC2DskSCMesG/XnklhFHQfwfrChDRso3a0Vg23tirbb3nKomK65qD/EketqyzfMbw5QGOmNOqkSbSklRGzFpwnpaLVVTRnGOHRx+qbB0g9HjSpgqh5b5hmYnOV+GMAyTz0QUIqRI0HYtNqaMgolDP82tXChSqBLPLCLsuFING4U/ODwA0lDiAwBGveofX3LejzY0kzUZVS1d3Z3kfuG3mmFHbgu1MWHNtYklvMuTsPEr7MdfssP78iUU2p4ADdncBU9WsgoMBx20iMikjsFXbIzMcEsA1Q/qLl5DH9S/ubg+GVRPs61SHQXL3rsNAkVLPTzjgN98aH/VsA9p2TzPH3uryRKZHaPZpFqn4Fef5ZTkdPTMN5q9J3goZXjOLKgFYbLKUTfBEhiwZmnjkUyzpDRwOKFo0lFTXXE4h9LfzJeJXkztvEI7POHe4gYTa4acjOxlo3f7C7jTjDLHE1Cp4mTIEqZ/0o=
+  file: release/Release.zip
+  on:
+    repo: turbonomiclabs/tbutil-scripts
