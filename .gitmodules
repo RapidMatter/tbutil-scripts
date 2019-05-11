@@ -1,12 +1,12 @@
 [submodule "turboclouddash_export/lib"]
 	path = turboclouddash_export/lib
-	url = git@github.com:turbonomiclabs/tbutil-script-libs.git
+	url = https://github.com/turbonomiclabs/tbutil-script-libs.git
 [submodule "cloud_migration_plans/lib"]
 	path = cloud_migration_plans/lib
-	url = git@github.com:turbonomiclabs/tbutil-script-libs.git
+	url = https://github.com/turbonomiclabs/tbutil-script-libs.git
 [submodule "aws_account_summary/lib"]
 	path = aws_account_summary/lib
-	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
+	url = https://github.com/turbonomic-labs/tbutil-script-libs.git
 [submodule "assessment/lib"]
 	path = assessment/lib
-	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
+	url = https://github.com/turbonomic-labs/tbutil-script-libs.git
