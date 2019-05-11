@@ -2,7 +2,7 @@ language: node_js
 node_js:
 - '7'
 before_script:
-- npm install -g gulp-cli gulp-concat
+- npm install -g gulp gulp-cli gulp-concat
 env:
 - DEPLOY_DIR=assessment
 script: cd $DEPLOY_DIR && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
