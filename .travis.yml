@@ -5,7 +5,7 @@ before_script:
 - npm install -g gulp gulp-cli gulp-concat
 env:
 - DEPLOY_DIR=assessment
-script: cd $DEPLOY_DIR && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
+script: cd $DEPLOY_DIR && npm link gulp && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
   cp $DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
 after_script:
 - cd $TRAVIS_BUILD_DIR/release
