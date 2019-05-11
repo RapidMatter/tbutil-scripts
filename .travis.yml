@@ -4,7 +4,7 @@ node_js:
 env:
 - DEPLOY_DIR=assessment
 script: cd $DEPLOY_DIR && npm install && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
-  cp $DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
+  cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
 after_script:
 - cd $TRAVIS_BUILD_DIR/release
 - zip Release.zip
