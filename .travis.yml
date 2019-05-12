@@ -10,11 +10,14 @@ before_deploy:
 - zip --help
 - zip $TRAVIS_BUILD_DIR/release/Release.zip $TRAVIS_BUILD_DIR/release/*
 deploy:
+  name: Master
   provider: releases
   api_key:
     secure: gclv9yPAvbKOLBYP22CDdSwZpoctL2Jsjl0MsG4w9EGlqUgtInYsXHjsTYhPqgWAkhf2AaFqC4IEPR1LmHcP0L09bgLT/DrbrpWlx0LmKY8VAKGH4dldDv15UwBBMqm5S/8yoGlfbvtn8cmkNMA0SfXiQmrcfcs2+nD5v02ta0xC5MrlPDZ6Sz+HRccLciz8FVNPPehNiUTwluC2DskSCMesG/XnklhFHQfwfrChDRso3a0Vg23tirbb3nKomK65qD/EketqyzfMbw5QGOmNOqkSbSklRGzFpwnpaLVVTRnGOHRx+qbB0g9HjSpgqh5b5hmYnOV+GMAyTz0QUIqRI0HYtNqaMgolDP82tXChSqBLPLCLsuFING4U/ODwA0lDiAwBGveofX3LejzY0kzUZVS1d3Z3kfuG3mmFHbgu1MWHNtYklvMuTsPEr7MdfssP78iUU2p4ADdncBU9WsgoMBx20iMikjsFXbIzMcEsA1Q/qLl5DH9S/ubg+GVRPs61SHQXL3rsNAkVLPTzjgN98aH/VsA9p2TzPH3uryRKZHaPZpFqn4Fef5ZTkdPTMN5q9J3goZXjOLKgFYbLKUTfBEhiwZmnjkUyzpDRwOKFo0lFTXXE4h9LfzJeJXkztvEI7POHe4gYTa4acjOxlo3f7C7jTjDLHE1Cp4mTIEqZ/0o=
   skip_cleanup: true
   file: $TRAVIS_BUILD_DIR/release/Release.zip
+  overwrite: true
   on:
+    tags: false
     branch: master
     repo: turbonomiclabs/tbutil-scripts
