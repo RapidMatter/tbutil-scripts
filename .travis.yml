@@ -5,9 +5,10 @@ env:
 - DEPLOY_DIR=assessment
 script: cd $DEPLOY_DIR && npm install && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
   cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
-after_script:
-- cd $TRAVIS_BUILD_DIR/release
-- zip Release.zip
+before_deploy:
+- ls $TRAVIS_BUILD_DIR/release
+- zip --help
+- zip $TRAVIS_BUILD_DIR/release/Release.zip $TRAVIS_BUILD_DIR/release/*
 deploy:
   provider: releases
   api_key:
@@ -15,4 +16,5 @@ deploy:
   skip_cleanup: true
   file: $TRAVIS_BUILD_DIR/release/Release.zip
   on:
+    branch: master
     repo: turbonomiclabs/tbutil-scripts
