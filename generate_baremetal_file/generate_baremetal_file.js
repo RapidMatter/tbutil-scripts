@@ -18,7 +18,7 @@ var Stat = (function () {
             var peakval = 0,
                 i = 0;
 
-            if (this.hasOwnProperty("days") && this.days != null) {
+            if (this.hasOwnProperty("days") && this.days !== null && this.days.hasOwnProperty("length")) {
                 for (i = 0; i < this.days.length; i++) {
                     if (this.days[i].hasOwnProperty("capacity")) {
                         if (this.days[i].capacity.total > peakval) {
@@ -34,7 +34,7 @@ var Stat = (function () {
             var peakval = 0,
                 i = 0;
 
-            if (this.hasOwnProperty("days") && this.days != null) {
+            if (this.hasOwnProperty("days") && this.days !== null && this.days.hasOwnProperty("length")) {
                 for (i = 0; i < this.days.length; i++) {
                     if (this.days[i].hasOwnProperty("values")) {
                         if (this.days[i].values.max > peakval) {
@@ -48,15 +48,19 @@ var Stat = (function () {
 
         Stat.prototype.average_utilization = function () {
             var totalval = 0,
-                i = 0;
+                i = 0,
+                retval = 0;
 
-            if (this.hasOwnProperty("days") && this.days != null) {
+            if (this.hasOwnProperty("days") && this.days !== null && this.days.hasOwnProperty("length")) {
                 for (i = 0; i < this.days.length; i++) {
-                    totalval = totalval + this.days[i].values.total;
+                    if (this.days[i].hasOwnProperty("values")) {
+                        totalval = totalval + this.days[i].values.total;
+                    }
                 }
+                retval = totalval / this.days.length;
             }
 
-            return totalval / this.days.length;
+            return retval;
         };
 
         Stat.prototype.add_day = function (day) {
