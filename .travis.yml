@@ -1,6 +1,8 @@
 language: node_js
 node_js:
 - '7'
+script:
+- echo "No tests yet"
 before_deploy:
 - for DEPLOY_DIR in $(ls -d */); do
     if [[ -f "${DEPLOY_DIR}gulpfile.js" ]]; then
@@ -11,6 +13,7 @@ before_deploy:
       cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
       ls $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR
     fi
+    cd $TRAVIS_BUILD_DIR
   done
 - cd $TRAVIS_BUILD_DIR/release
 - zip Release.zip *
