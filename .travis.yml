@@ -5,9 +5,10 @@ env:
 - DEPLOY_DIR=assessment
 - DEPLOY_DIR=entity-details
 script: cd $DEPLOY_DIR && npm install && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
-  cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
+  cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/ && ls $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR
 before_deploy:
-- zip $TRAVIS_BUILD_DIR/release/Release.zip $TRAVIS_BUILD_DIR/release/*
+- cd $TRAVIS_BUILD_DIR/release
+- zip Release.zip *
 deploy:
   name: Master
   provider: releases
@@ -17,6 +18,5 @@ deploy:
   file: $TRAVIS_BUILD_DIR/release/Release.zip
   overwrite: true
   on:
-    tags: false
     branch: master
     repo: turbonomiclabs/tbutil-scripts
