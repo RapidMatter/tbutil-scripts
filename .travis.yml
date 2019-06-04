@@ -11,12 +11,11 @@ before_deploy:
       gulp;
       mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR;
       cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/;
-      ls $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR;
     fi;
     cd $TRAVIS_BUILD_DIR;
   done
 - cd $TRAVIS_BUILD_DIR/release
-- zip Release.zip *
+- zip -r Release.zip .
 deploy:
   name: Master
   provider: releases
