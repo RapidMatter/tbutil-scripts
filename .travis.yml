@@ -1,12 +1,17 @@
 language: node_js
 node_js:
 - '7'
-env:
-- DEPLOY_DIR=assessment
-- DEPLOY_DIR=entity-details
-script: cd $DEPLOY_DIR && npm install && gulp && mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR &&
-  cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/ && ls $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR
 before_deploy:
+- for DEPLOY_DIR in $(ls -d */); do
+    if [[ -f "${DEPLOY_DIR}gulpfile.js" ]]; then
+      cd $TRAVIS_BUILD_DIR/$DEPLOY_DIR
+      npm install
+      gulp
+      mkdir -p $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR
+      cp $TRAVIS_BUILD_DIR/$DEPLOY_DIR/dist/* $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR/
+      ls $TRAVIS_BUILD_DIR/release/$DEPLOY_DIR
+    fi
+  done
 - cd $TRAVIS_BUILD_DIR/release
 - zip Release.zip *
 deploy:
