@@ -7,4 +7,11 @@ function highlander() {
         .pipe(gulp.dest('dist/'));
 };
 
+function csv() {
+  return gulp.src(['lib/*.js', 'csv.js'])
+        .pipe(concat('csv.js'))
+        .pipe(gulp.dest('dist/'));
+}
+
 exports.default = highlander;
+exports.csv = csv;

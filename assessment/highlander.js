@@ -1,4 +1,4 @@
-/*global args,client,eprintln,exit,getenv,interpolate,print,println,require*/
+/*global args,client,eprintln,exit,getenv,interpolate,print,println*/
 /*jslint plusplus: true*/
 
 var CloudMigrationHighlanderReport = (function () {
