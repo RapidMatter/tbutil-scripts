@@ -10,3 +10,6 @@
 [submodule "assessment/lib"]
 	path = assessment/lib
 	url = https://github.com/turbonomic-labs/tbutil-script-libs.git
+[submodule "tags/lib"]
+	path = tags/lib
+	url = git@github.com:turbonomic-labs/tbutil-script-libs.git
