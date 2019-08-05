@@ -75,10 +75,12 @@ var environment_type = "HYBRID",
     entity_types = ["VirtualMachine"],
     peak = true,
     average = false,
+    anonomize = false,
     limit = 0,
     number_of_days = 30,
     vms = [],
     hosts = {},
+    name_map = {},
     i,
     normalized_vm,
     aspects,
@@ -102,7 +104,8 @@ var environment_type = "HYBRID",
     netStat,
     storStat,
     numVCPUs,
-    state;
+    state,
+    displayName;
 
 function print_usage() {
     "use strict";
@@ -116,6 +119,7 @@ function print_usage() {
     eprintln("    [-l {limit} (default: unset, resulting in all available VMs matching the environment and scope)]");
     eprintln("    [-p A flag, when set the resulting file will be based on peak utilization values for each VM. (default: true)]");
     eprintln("    [-a A flag, when set the resulting file will be based on average utilization values for each VM. (default: false)]");
+    eprintln("    [-n A flag, when set the resulting file will contain anonomized hostnames and a mapping file hosts-<state>-mapping.json will be created. (default: false)]");
     eprintln("");
 }
 
@@ -142,6 +146,9 @@ for (i = 0; i < args.length; i++) {
     }
     if (args[i] === "-t") {
         entity_types = args[i + 1].split(",").map(function (s) { "use strict"; return s.toLowerCase(); });
+    }
+    if (args[i] === "-n") {
+        anonomize = true;
     }
 }
 
@@ -183,6 +190,9 @@ for (i = 0; i < rtn.length; i++) {
     println(normalized_vm.uuid);
     if (!hosts.hasOwnProperty(normalized_vm.state)) {
         hosts[normalized_vm.state] = [];
+    }
+    if (!name_map.hasOwnProperty(normalized_vm.state)) {
+        name_map[normalized_vm.state] = [];
     }
     aspects = client.getAspectsByEntityUuid(rtn[i].uuid);
     aspect_types = Object.keys(aspects);
@@ -229,6 +239,11 @@ for (i = 0; i < rtn.length; i++) {
         netStat = new Stat(normalized_vm.new_stats['netthroughput_kbit/sec']);
         storStat = new Stat(normalized_vm.new_stats.storageamount_mb);
         numVCPUs = 1;
+        displayName = normalized_vm.displayName;
+        if (anonomize) {
+            displayName = i;
+            name_map[normalized_vm.state].push({"anon": i, "real": normalized_vm.displayName});
+        }
         if (normalized_vm.hasOwnProperty("aspects") && normalized_vm.aspects.hasOwnProperty("numVCPUs")) {
             numVCPUs = normalized_vm.aspects.numVCPUs;
         }
@@ -236,7 +251,7 @@ for (i = 0; i < rtn.length; i++) {
         if (peak === true) {
             hosts[normalized_vm.state].push({
                 "ipAddresses": ["0.0.0.0"],
-                "displayName": normalized_vm.displayName,
+                "displayName": displayName,
                 "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
                 "osName": normalized_vm.aspects.os,
                 "numOfCPU": numVCPUs.toString(),
@@ -253,7 +268,7 @@ for (i = 0; i < rtn.length; i++) {
         if (average === true) {
             hosts[normalized_vm.state].push({
                 "ipAddresses": ["0.0.0.0"],
-                "displayName": normalized_vm.displayName,
+                "displayName": displayName,
                 "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
                 "osName": normalized_vm.aspects.os,
                 "numOfCPU": numVCPUs.toString(),
@@ -274,5 +289,11 @@ for (i = 0; i < rtn.length; i++) {
 for (state in hosts) {
     if (hosts.hasOwnProperty(state)) {
         writeJson(interpolate("hosts-${state.toLowerCase()}.json"), {"hosts": hosts[state]});
+    }
+}
+
+for (state in name_map) {
+    if (name_map.hasOwnProperty(state)) {
+        writeJson(interpolate("hosts-${state.toLowerCase()}-mapping.json"), name_map[state]);
     }
 }
