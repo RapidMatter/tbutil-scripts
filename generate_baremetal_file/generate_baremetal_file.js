@@ -241,8 +241,8 @@ for (i = 0; i < rtn.length; i++) {
         numVCPUs = 1;
         displayName = normalized_vm.displayName;
         if (anonomize) {
-            displayName = i;
-            name_map[normalized_vm.state].push({"anon": i, "real": normalized_vm.displayName});
+            displayName = i.toString(10);
+            name_map[normalized_vm.state].push({"anon": displayName, "real": normalized_vm.displayName});
         }
         if (normalized_vm.hasOwnProperty("aspects") && normalized_vm.aspects.hasOwnProperty("numVCPUs")) {
             numVCPUs = normalized_vm.aspects.numVCPUs;
