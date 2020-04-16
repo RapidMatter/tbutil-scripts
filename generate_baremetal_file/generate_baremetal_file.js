@@ -222,7 +222,9 @@ for (i = 0; i < rtn.length; i++) {
                 if (stats[day].statistics[stat].hasOwnProperty("filters")) {
                     for (filter = 0; filter < stats[day].statistics[stat].filters.length; filter++) {
                         if (stats[day].statistics[stat].filters[filter].type === "key") {
-                            stat_name_key = "_" + stats[day].statistics[stat].filters[filter].value.toLowerCase();
+                            if (stats[day].statistics[stat].filters[filter].value.toLowerCase() !== "") {
+                                stat_name_key = "_" + stats[day].statistics[stat].filters[filter].value.toLowerCase();
+                            }
                         }
                     }
                 }
@@ -291,6 +293,7 @@ for (i = 0; i < rtn.length; i++) {
     } catch (err) {
         vms_with_errors += 1;
         eprintln(interpolate("Error while fetching data for ${normalized_vm.uuid}. Error: ${err}"));
+        eprintln(err.stack);
         print("Normalized VM Object: ");
         printJson(normalized_vm);
         print("Aspect Data: ");
