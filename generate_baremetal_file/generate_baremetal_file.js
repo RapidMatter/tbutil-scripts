@@ -311,3 +311,5 @@ for (state in name_map) {
         writeJson(interpolate("hosts-${state.toLowerCase()}-mapping.json"), name_map[state]);
     }
 }
+
+println(interpolate("Baremetal hosts file(s) created for ${rtn.length-vms_with_errors}/${rtn.length} VMs. See previous output for details on ${vms_with_errors} VMs with errors."));
