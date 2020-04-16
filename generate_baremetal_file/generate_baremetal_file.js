@@ -105,7 +105,8 @@ var environment_type = "HYBRID",
     storStat,
     numVCPUs,
     state,
-    displayName;
+    displayName,
+    vms_with_errors = 0;
 
 function print_usage() {
     "use strict";
@@ -183,106 +184,119 @@ stats_req = {
 
 // For every VM returned by the search..
 for (i = 0; i < rtn.length; i++) {
-    normalized_vm = rtn[i];
-    normalized_vm.aspects = {};
-    normalized_vm.stats = {};
-    normalized_vm.new_stats = {};
-    println(normalized_vm.uuid);
-    if (!hosts.hasOwnProperty(normalized_vm.state)) {
-        hosts[normalized_vm.state] = [];
-    }
-    if (!name_map.hasOwnProperty(normalized_vm.state)) {
-        name_map[normalized_vm.state] = [];
-    }
-    aspects = client.getAspectsByEntityUuid(rtn[i].uuid);
-    aspect_types = Object.keys(aspects);
-    for (atype = 0; atype < aspect_types.length; atype++) {
-        aspect_keys = Object.keys(aspects[aspect_types[atype]]);
-        for (a = 0; a < aspect_keys.length; a++) {
-            normalized_vm.aspects[aspect_keys[a]] = aspects[aspect_types[atype]][aspect_keys[a]];
+    try {
+        normalized_vm = rtn[i];
+        normalized_vm.aspects = {};
+        normalized_vm.stats = {};
+        normalized_vm.new_stats = {};
+        aspects = {};
+        stats = [];
+        println(normalized_vm.uuid);
+        if (!hosts.hasOwnProperty(normalized_vm.state)) {
+            hosts[normalized_vm.state] = [];
         }
-    }
+        if (!name_map.hasOwnProperty(normalized_vm.state)) {
+            name_map[normalized_vm.state] = [];
+        }
+        aspects = client.getAspectsByEntityUuid(rtn[i].uuid);
+        aspect_types = Object.keys(aspects);
+        for (atype = 0; atype < aspect_types.length; atype++) {
+            aspect_keys = Object.keys(aspects[aspect_types[atype]]);
+            for (a = 0; a < aspect_keys.length; a++) {
+                normalized_vm.aspects[aspect_keys[a]] = aspects[aspect_types[atype]][aspect_keys[a]];
+            }
+        }
 
-    // Grab all of the statistics for the last 30 days
-    if (number_of_days > 0) {
-        stats = client.getStatsByUuidQuery(rtn[i].uuid, stats_req);
-    } else {
-        stats = client.getStatsByEntityUuid(rtn[i].uuid, {});
-    }
-    // For each day of stats..
-    for (day = 0; day < stats.length; day++) {
-        // and each stat from that day..
-        for (stat = 0; stat < stats[day].statistics.length; stat++) {
-            // Build a unique "stat name"
-            stat_name_key = "";
-            if (stats[day].statistics[stat].hasOwnProperty("filters")) {
-                for (filter = 0; filter < stats[day].statistics[stat].filters.length; filter++) {
-                    if (stats[day].statistics[stat].filters[filter].type === "key") {
-                        stat_name_key = "_" + stats[day].statistics[stat].filters[filter].value.toLowerCase();
+        // Grab all of the statistics for the last 30 days
+        if (number_of_days > 0) {
+            stats = client.getStatsByUuidQuery(rtn[i].uuid, stats_req);
+        } else {
+            stats = client.getStatsByEntityUuid(rtn[i].uuid, {});
+        }
+        // For each day of stats..
+        for (day = 0; day < stats.length; day++) {
+            // and each stat from that day..
+            for (stat = 0; stat < stats[day].statistics.length; stat++) {
+                // Build a unique "stat name"
+                stat_name_key = "";
+                if (stats[day].statistics[stat].hasOwnProperty("filters")) {
+                    for (filter = 0; filter < stats[day].statistics[stat].filters.length; filter++) {
+                        if (stats[day].statistics[stat].filters[filter].type === "key") {
+                            stat_name_key = "_" + stats[day].statistics[stat].filters[filter].value.toLowerCase();
+                        }
                     }
                 }
+                stat_name = stats[day].statistics[stat].name + stat_name_key + "_" + stats[day].statistics[stat].units;
+                stat_name = stat_name.toLowerCase();
+                if (!normalized_vm.new_stats.hasOwnProperty(stat_name)) {
+                    normalized_vm.new_stats[stat_name] = [];
+                }
+                normalized_vm.new_stats[stat_name].push(stats[day].statistics[stat]);
             }
-            stat_name = stats[day].statistics[stat].name + stat_name_key + "_" + stats[day].statistics[stat].units;
-            stat_name = stat_name.toLowerCase();
-            if (!normalized_vm.new_stats.hasOwnProperty(stat_name)) {
-                normalized_vm.new_stats[stat_name] = [];
+        }
+
+
+        if (stats.length > 0) {
+            cpuStat = new Stat(normalized_vm.new_stats.vcpu_mhz);
+            memStat = new Stat(normalized_vm.new_stats.vmem_kb);
+            ioStat = new Stat(normalized_vm.new_stats['iothroughput_kbit/sec']);
+            netStat = new Stat(normalized_vm.new_stats['netthroughput_kbit/sec']);
+            storStat = new Stat(normalized_vm.new_stats.storageamount_mb);
+            numVCPUs = 1;
+            displayName = normalized_vm.displayName;
+            if (anonomize) {
+                displayName = i.toString(10);
+                name_map[normalized_vm.state].push({"anon": displayName, "real": normalized_vm.displayName});
             }
-            normalized_vm.new_stats[stat_name].push(stats[day].statistics[stat]);
-        }
-    }
+            if (normalized_vm.hasOwnProperty("aspects") && normalized_vm.aspects.hasOwnProperty("numVCPUs")) {
+                numVCPUs = normalized_vm.aspects.numVCPUs;
+            }
 
+            if (peak === true) {
+                hosts[normalized_vm.state].push({
+                    "ipAddresses": ["0.0.0.0"],
+                    "displayName": displayName,
+                    "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
+                    "osName": normalized_vm.aspects.os,
+                    "numOfCPU": numVCPUs.toString(),
+                    "memSizeGB": (memStat.peak_capacity() / 1048576).toString(),
+                    "memUtilization": ((memStat.peak_utilization() / 1048576) / (memStat.peak_capacity()) / 1048576 * 100).toString(),
+                    "cpuSpeedMhz": (cpuStat.peak_capacity() / numVCPUs).toString(),
+                    "cpuUtilization": ((cpuStat.peak_utilization() / numVCPUs) / (cpuStat.peak_capacity() / numVCPUs) * 100).toString(),
+                    "diskSizeGB": (storStat.peak_utilization() / 1024).toString(),
+                    "diskDataKB": ioStat.peak_utilization().toString(),
+                    "netTrafficKB": netStat.peak_utilization().toString()
+                });
+            }
 
-    if (stats.length > 0) {
-        cpuStat = new Stat(normalized_vm.new_stats.vcpu_mhz);
-        memStat = new Stat(normalized_vm.new_stats.vmem_kb);
-        ioStat = new Stat(normalized_vm.new_stats['iothroughput_kbit/sec']);
-        netStat = new Stat(normalized_vm.new_stats['netthroughput_kbit/sec']);
-        storStat = new Stat(normalized_vm.new_stats.storageamount_mb);
-        numVCPUs = 1;
-        displayName = normalized_vm.displayName;
-        if (anonomize) {
-            displayName = i.toString(10);
-            name_map[normalized_vm.state].push({"anon": displayName, "real": normalized_vm.displayName});
+            if (average === true) {
+                hosts[normalized_vm.state].push({
+                    "ipAddresses": ["0.0.0.0"],
+                    "displayName": displayName,
+                    "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
+                    "osName": normalized_vm.aspects.os,
+                    "numOfCPU": numVCPUs.toString(),
+                    "memSizeGB": (memStat.peak_capacity() / 1048576).toString(),
+                    "memUtilization": ((memStat.average_utilization() / 1048576) / (memStat.peak_capacity()) / 1048576 * 100).toString(),
+                    "cpuSpeedMhz": (cpuStat.peak_capacity() / numVCPUs).toString(),
+                    "cpuUtilization": ((cpuStat.average_utilization() / numVCPUs) / (cpuStat.peak_capacity() / numVCPUs) * 100).toString(),
+                    "diskSizeGB": (storStat.average_utilization() / 1024).toString(),
+                    "diskDataKB": ioStat.average_utilization().toString(),
+                    "netTrafficKB": netStat.average_utilization().toString()
+                });
+            }
+        } else {
+            eprintln(interpolate("No stats for ${normalized_vm.uuid}"));
         }
-        if (normalized_vm.hasOwnProperty("aspects") && normalized_vm.aspects.hasOwnProperty("numVCPUs")) {
-            numVCPUs = normalized_vm.aspects.numVCPUs;
-        }
-
-        if (peak === true) {
-            hosts[normalized_vm.state].push({
-                "ipAddresses": ["0.0.0.0"],
-                "displayName": displayName,
-                "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
-                "osName": normalized_vm.aspects.os,
-                "numOfCPU": numVCPUs.toString(),
-                "memSizeGB": (memStat.peak_capacity() / 1048576).toString(),
-                "memUtilization": ((memStat.peak_utilization() / 1048576) / (memStat.peak_capacity()) / 1048576 * 100).toString(),
-                "cpuSpeedMhz": (cpuStat.peak_capacity() / numVCPUs).toString(),
-                "cpuUtilization": ((cpuStat.peak_utilization() / numVCPUs) / (cpuStat.peak_capacity() / numVCPUs) * 100).toString(),
-                "diskSizeGB": (storStat.peak_utilization() / 1024).toString(),
-                "diskDataKB": ioStat.peak_utilization().toString(),
-                "netTrafficKB": netStat.peak_utilization().toString()
-            });
-        }
-
-        if (average === true) {
-            hosts[normalized_vm.state].push({
-                "ipAddresses": ["0.0.0.0"],
-                "displayName": displayName,
-                "entityId": interpolate("${Date.now()}-${normalized_vm.uuid}"),
-                "osName": normalized_vm.aspects.os,
-                "numOfCPU": numVCPUs.toString(),
-                "memSizeGB": (memStat.peak_capacity() / 1048576).toString(),
-                "memUtilization": ((memStat.average_utilization() / 1048576) / (memStat.peak_capacity()) / 1048576 * 100).toString(),
-                "cpuSpeedMhz": (cpuStat.peak_capacity() / numVCPUs).toString(),
-                "cpuUtilization": ((cpuStat.average_utilization() / numVCPUs) / (cpuStat.peak_capacity() / numVCPUs) * 100).toString(),
-                "diskSizeGB": (storStat.average_utilization() / 1024).toString(),
-                "diskDataKB": ioStat.average_utilization().toString(),
-                "netTrafficKB": netStat.average_utilization().toString()
-            });
-        }
-    } else {
-        eprintln(interpolate("No stats for ${normalized_vm.uuid}"));
+    } catch (err) {
+        vms_with_errors += 1;
+        eprintln(interpolate("Error while fetching data for ${normalized_vm.uuid}. Error: ${err}"));
+        print("Normalized VM Object: ");
+        printJson(normalized_vm);
+        print("Aspect Data: ");
+        printJson(aspects);
+        print("Stat Data: ");
+        printJson(stats);
     }
 }
 
